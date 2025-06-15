@@ -1,6 +1,6 @@
 # Config
 MODULE_NAME = dawn_db
-ROCKSPEC = dawn_db_manager.rockspec
+ROCKSPEC = dawn_db-1.0-1.rockspec
 ROCKFILE = $(MODULE_NAME)-1.0-1.rock
 LUAJIT_INCLUDE = /usr/include/luajit-2.1
 BUILD_DIR = build
@@ -37,8 +37,10 @@ rock:
 	@echo "✅ Rock built: $(ROCKFILE)"
 
 install:
-	@echo "📥 Installing LuaRocks package..."
-	@sudo luarocks install $(ROCKFILE)
+	@echo "📥 Installing LuaRocks package using 'luarocks make'..."
+	# Explicitly tell luarocks make to use luajit as the interpreter
+	@luarocks make $(ROCKSPEC)
+
 
 test:
 	@echo "🧪 Testing installed module..."
