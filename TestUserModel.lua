@@ -15,6 +15,7 @@ local TestUser = Model:extend("test_users", {
     _primary_key = "id",
     _indexes = { "email" },
     _unique_keys = { { "email" } },
+    _model_classes = require('init_models')
 })
 
 return TestUser
