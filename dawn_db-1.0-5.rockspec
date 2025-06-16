@@ -1,6 +1,6 @@
--- dawn_db-1.0-3.rockspec
+-- dawn_db-1.0-5.rockspec
 package = "dawn_db"
-version = "1.0-3"
+version = "1.0-5"
 source = {
   -- For local packing with 'luarocks pack', use the current directory.
   dir = ".",
@@ -27,8 +27,12 @@ dependencies = {
 build = {
   -- Set the build type to "cmake" since you are using CMake for your native module.
 
-  type = "cmake", -- Use "command" type for custom shell commands.
+  type = "command", -- Use "command" type for custom shell commands.
 
+    build_command = [[
+      chmod +x build.sh
+      ./build.sh
+   ]],
    -- 'build_command' contains the commands to execute during the build phase.
    -- **ALL COMMENTS REMOVED FROM THIS SECTION**
 
