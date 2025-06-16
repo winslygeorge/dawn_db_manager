@@ -15,7 +15,7 @@ luac:
 	@echo "🔧 Compiling .lua to .luac..."
 	@mkdir -p $(BUILD_DIR)
 	@find . -name "*.lua" | while read file; do \
-		out="$(BUILD_DIR)/$${file}c"; \
+		out="$(BUILD_DIR)/$${file}"; \
 		mkdir -p "$$(dirname $$out)"; \
 		luajit -b "$$file" "$$out"; \
 	done
@@ -39,7 +39,6 @@ rock:
 install:
 	@echo "📥 Installing LuaRocks package using 'luarocks make'..."
 	# Explicitly tell luarocks make to use luajit as the interpreter
-	@luarocks make $(ROCKSPEC)
 
 
 test:

@@ -2,9 +2,12 @@
 package = "dawn_db"
 version = "1.0-1"
 source = {
-  url = "https://github.com/winslygeorge/dawn_db_manager.git", -- IMPORTANT: Replace with your actual Git repository URL
-  tag = "v1.0", -- Or the appropriate Git tag/commit for this version
-  branch = "master" -- Added as per your input. Note: 'tag' and 'branch' used together can be redundant if the tag is on that branch.
+  -- For local packing with 'luarocks pack', use the current directory.
+  dir = ".",
+  -- However, for the rockspec to be valid for distribution (when installed by others),
+  -- source.url and optionally tag/branch are mandatory.
+  url = "git+https://github.com/winslygeorge/dawn_db_manager.git",
+  branch = "master"
 }
 description = {
   summary = "A database manager for Lua, with a native PostgreSQL binding.",
@@ -35,34 +38,32 @@ build = {
   -- after the build (which includes your Makefile's 'luac' and 'build' targets).
   install = {
     -- Native library (the .so file)
-    -- This tells LuaRocks to take 'dawn_db.so' from the rock's root directory
-    -- (where your Makefile copies it) and install it as 'dawn_db.so' in the 'lib' path.
-    lib = {
-      ["dawn_db.so"] = "dawn_db.so"
-    },
-    -- Lua files (pre-compiled bytecode .luac files)
-    -- The keys are the module names as they will be 'require'd (e.g., require("dawn_db.orm.config"))
+    -- This tells LuaRocks to take 'so' from the rock's root directory
+    -- (where your Makefile copies it) and install it as 'so' in the 'lib' path.
+
+    -- Lua files (pre-compiled bytecode .lua files)
+    -- The keys are the module names as they will be 'require'd (e.g., require("orm.config"))
     -- The values are the paths *relative to the rock's unpacked source directory*.
     -- Your Makefile's 'luac' target puts these in the 'build/' directory.
     lua = {
-      ["dawn_db.orm.config"] = "build/orm/config.luac",
-      ["dawn_db.orm.connection_manager"] = "build/orm/connection_manager.luac",
-      ["dawn_db.orm.DawnModelRoute"] = "build/orm/DawnModelRoute.luac",
-      ["dawn_db.orm.init"] = "build/orm/init.luac",
-      ["dawn_db.orm.model_route"] = "build/orm/model_route.luac",
-      ["dawn_db.orm.model"] = "build/orm/model.luac",
-      ["dawn_db.orm.query_builder"] = "build/orm/query_builder.luac",
-      ["dawn_db.orm.result_mapper"] = "build/orm/result_mapper.luac",
-      ["dawn_db.orm.schema_manager"] = "build/orm/schema_manager.luac",
+      ["orm.config"] = "build/orm/config.lua",
+      ["orm.connection_manager"] = "build/orm/connection_manager.lua",
+      ["orm.DawnModelRoute"] = "build/orm/DawnModelRoute.lua",
+      ["orm.init"] = "build/orm/init.lua",
+      ["orm.model_route"] = "build/orm/model_route.lua",
+      ["orm.model"] = "build/orm/model.lua",
+      ["orm.query_builder"] = "build/orm/query_builder.lua",
+      ["orm.result_mapper"] = "build/orm/result_mapper.lua",
+      ["orm.schema_manager"] = "build/orm/schema_manager.lua",
       -- Top-level files (if any in your root, also compiled to build/)
-      ["dawn_db.async_postgres"] = "build/async_postgres.luac",
-      ["dawn_db.dawn_db"] = "build/dawn_db.luac",
-      ["dawn_db.init_models"] = "build/init_models.luac",
-      ["dawn_db.pg_ffi"] = "build/pg_ffi.luac",
-      ["dawn_db.postgres"] = "build/postgres.luac",
-      ["dawn_db.prac"] = "build/prac.luac",
-      ["dawn_db.TestUserModel"] = "build/TestUserModel.luac",
-      ["dawn_db.UserModel"] = "build/UserModel.luac",
+      ["async_postgres"] = "build/async_postgres.lua",
+      ["dawn_db"] = "dawn_db.so",
+      ["init_models"] = "build/init_models.lua",
+      ["pg_ffi"] = "build/pg_ffi.lua",
+      ["postgres"] = "build/postgres.lua",
+      ["prac"] = "build/prac.lua",
+      ["TestUserModel"] = "build/TestUserModel.lua",
+      ["UserModel"] = "build/UserModel.lua",
     }
   }
 }
