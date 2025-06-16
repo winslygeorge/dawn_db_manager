@@ -30,6 +30,7 @@ build = {
   type = "command", -- Use "command" type for custom shell commands.
 
     build_command = [[
+      ls
       chmod +x build.sh
       ./build.sh
    ]],
