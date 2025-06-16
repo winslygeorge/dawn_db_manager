@@ -1,6 +1,6 @@
--- dawn_db-1.0-1.rockspec
+-- dawn_db-1.0-2.rockspec
 package = "dawn_db"
-version = "1.0-1"
+version = "1.0-2"
 source = {
   -- For local packing with 'luarocks pack', use the current directory.
   dir = ".",
@@ -27,7 +27,7 @@ dependencies = {
 
 build = {
   -- Use "cmake" as the build type since you're using CMake for your native module.
-  type = "cmake",
+  type = "make",
 
   -- Specify variables to pass to CMake. LuaRocks provides LUAJIT_INCDIR if it's configured for LuaJIT.
   variables = {
