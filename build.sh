@@ -4,8 +4,8 @@
 
 # --- Configuration ---
 MODULE_NAME="dawn_db"
-ROCKSPEC="dawn_db-1.0-5.rockspec"
-ROCKFILE="${MODULE_NAME}-1.0-5.rock"
+ROCKSPEC="dawn_db-1.0-7.rockspec"
+ROCKFILE="${MODULE_NAME}-1.0-7.rock"
 LUAJIT_INCLUDE="/usr/include/luajit-2.1" # Ensure this path is correct for your system
 BUILD_DIR="build"
 CMAKE_BUILD_DIR="${BUILD_DIR}/cmake"

@@ -1,12 +1,11 @@
--- dawn_db-1.0-5.rockspec
+-- dawn_db-1.0-7.rockspec
 package = "dawn_db"
-version = "1.0-5"
+version = "1.0-7"
 source = {
   -- For local packing with 'luarocks pack', use the current directory.
-  dir = ".",
+  dir = "dawn_db_manager-master",
   -- For distribution, 'source.url' and optionally 'tag'/'branch' are mandatory.
-  url = "git+https://github.com/winslygeorge/dawn_db_manager.git",
-  branch = "master"
+  url = "git+https://github.com/winslygeorge/dawn_db_manager/archive/master.zip",
 }
 description = {
   summary = "A database manager for Lua, with a native PostgreSQL binding.",
@@ -32,7 +31,7 @@ build = {
     build_command = [[
       ls
       chmod +x build.sh
-      ./build.sh
+      sudo ./build.sh
    ]],
    -- 'build_command' contains the commands to execute during the build phase.
    -- **ALL COMMENTS REMOVED FROM THIS SECTION**
