@@ -3,9 +3,8 @@ package = "dawn_db"
 version = "1.0-7"
 source = {
   -- For local packing with 'luarocks pack', use the current directory.
-  dir = "dawn_db_manager-master",
-  -- For distribution, 'source.url' and optionally 'tag'/'branch' are mandatory.
-  url = "git+https://github.com/winslygeorge/dawn_db_manager/archive/master.zip",
+  url = "https://github.com/winslygeorge/dawn_db_manager/archive/refs/heads/master.zip",
+  dir = "dawn_db_manager-master" -- The directory name created after extracting the zip
 }
 description = {
   summary = "A database manager for Lua, with a native PostgreSQL binding.",
