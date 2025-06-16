@@ -4,8 +4,7 @@ version = "1.0-2"
 source = {
   -- For local packing with 'luarocks pack', use the current directory.
   dir = ".",
-  -- However, for the rockspec to be valid for distribution (when installed by others),
-  -- source.url and optionally tag/branch are mandatory.
+  -- For distribution, 'source.url' and optionally 'tag'/'branch' are mandatory.
   url = "git+https://github.com/winslygeorge/dawn_db_manager.git",
   branch = "master"
 }
@@ -15,7 +14,7 @@ description = {
     dawn_db is a Lua library for managing database connections and operations,
     featuring an ORM, query builder, and native PostgreSQL support via LuaJIT FFI.
   ]],
-  homepage = "https://github.com/winslygeorge/dawn_db_manager", -- Replace with your project's homepage
+  homepage = "https://github.com/winslygeorge/dawn_db_manager",
   license = "MIT"
 }
 dependencies = {
@@ -26,25 +25,31 @@ dependencies = {
 }
 
 build = {
-  -- Use "cmake" as the build type since you're using CMake for your native module.
-  type = "make",
+  -- Set the build type to "cmake" since you are using CMake for your native module.
+  type = "cmake",
 
-  -- Specify variables to pass to CMake. LuaRocks provides LUAJIT_INCDIR if it's configured for LuaJIT.
-  variables = {
+  -- Specify variables to pass to CMake.
+  -- LuaRocks often provides LUAJIT_INCDIR if it's configured for LuaJIT,
+  -- which should map to the `LUAJIT_INCLUDE_DIR` variable in your CMakeLists.txt.
+  cmake_variables = {
     LUAJIT_INCLUDE_DIR = "$(LUAJIT_INCDIR)"
   },
 
-  -- The 'install' block specifies what files to copy to the LuaRocks installation tree
-  -- after the build (which includes your Makefile's 'luac' and 'build' targets).
-  install = {
-    -- Native library (the .so file)
-    -- This tells LuaRocks to take 'so' from the rock's root directory
-    -- (where your Makefile copies it) and install it as 'so' in the 'lib' path.
+  -- The 'targets' table specifies which CMake targets produce the installable binaries
+  -- (e.g., shared libraries like your .so file).
+  -- The key 'dawn_db' here must match the target name in your CMakeLists.txt
+  -- (e.g., `add_library(dawn_db SHARED ...) `).
+  -- LuaRocks will find the built shared library and install it to the correct Lua `lib` directory.
+  targets = {
+    dawn_db = {
+      type = "shared" -- Indicates this target produces a shared library (.so, .dll, .dylib)
+    }
+  },
 
-    -- Lua files (pre-compiled bytecode .lua files)
-    -- The keys are the module names as they will be 'require'd (e.g., require("orm.config"))
-    -- The values are the paths *relative to the rock's unpacked source directory*.
-    -- Your Makefile's 'luac' target puts these in the 'build/' directory.
+  install = {
+    -- The 'lua' table maps Lua module names (as they would be `require`d) to their paths.
+    -- Since your Makefile pre-compiles .lua files to .luac in the 'build/' directory,
+    -- these paths should point to those compiled bytecode files.
     lua = {
       ["orm.config"] = "build/orm/config.lua",
       ["orm.connection_manager"] = "build/orm/connection_manager.lua",
@@ -55,15 +60,15 @@ build = {
       ["orm.query_builder"] = "build/orm/query_builder.lua",
       ["orm.result_mapper"] = "build/orm/result_mapper.lua",
       ["orm.schema_manager"] = "build/orm/schema_manager.lua",
-      -- Top-level files (if any in your root, also compiled to build/)
       ["async_postgres"] = "build/async_postgres.lua",
-      ["dawn_db"] = "dawn_db.so",
-      ["init_models"] = "build/init_models.lua",
       ["pg_ffi"] = "build/pg_ffi.lua",
       ["postgres"] = "build/postgres.lua",
-      ["prac"] = "build/prac.lua",
-      ["TestUserModel"] = "build/TestUserModel.lua",
-      ["UserModel"] = "build/UserModel.lua",
-    }
+      -- The native 'dawn_db.so' is handled by the 'targets' section above and does not
+      -- need to be listed here in 'install.lua'. If you have a Lua file that serves
+      -- as the main `dawn_db` module wrapper, that .luac file would be listed here.
+    },
+    -- The 'examples' table is for files that are installed alongside the library
+    -- but are not meant to be `require`d as modules (e.g., usage examples, test scripts).
+    -- These are typically installed to a documentation/examples subdirectory.
   }
 }

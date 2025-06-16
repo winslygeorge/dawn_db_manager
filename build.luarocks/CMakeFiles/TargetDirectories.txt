@@ -1,7 +1,0 @@
-/home/winslow/projects/dawn_db_manager/build.luarocks/CMakeFiles/dawn_db.dir
-/home/winslow/projects/dawn_db_manager/build.luarocks/CMakeFiles/edit_cache.dir
-/home/winslow/projects/dawn_db_manager/build.luarocks/CMakeFiles/rebuild_cache.dir
-/home/winslow/projects/dawn_db_manager/build.luarocks/CMakeFiles/list_install_components.dir
-/home/winslow/projects/dawn_db_manager/build.luarocks/CMakeFiles/install.dir
-/home/winslow/projects/dawn_db_manager/build.luarocks/CMakeFiles/install/local.dir
-/home/winslow/projects/dawn_db_manager/build.luarocks/CMakeFiles/install/strip.dir

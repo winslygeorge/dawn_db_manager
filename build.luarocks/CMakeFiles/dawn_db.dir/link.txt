@@ -1,1 +1,0 @@
-/usr/bin/c++ -fPIC -shared -Wl,-soname,dawn_db.so -o dawn_db.so CMakeFiles/dawn_db.dir/dawn_db_wrapper.cpp.o  -lluajit-5.1 
