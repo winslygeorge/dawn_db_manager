@@ -1,6 +1,6 @@
--- dawn_db-1.0-7.rockspec
+-- dawn_db-1.0-8.rockspec
 package = "dawn_db"
-version = "1.0-7"
+version = "1.0-8"
 source = {
   -- For local packing with 'luarocks pack', use the current directory.
   url = "https://github.com/winslygeorge/dawn_db_manager/archive/refs/heads/master.zip",
