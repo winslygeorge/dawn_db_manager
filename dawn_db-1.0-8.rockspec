@@ -2,8 +2,8 @@
 package = "dawn_db"
 version = "1.0-8"
 source = {
-  url = "https://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@github.com/winslygeorge/dawn_db_manager/archive/refs/heads/master.zip",
-  dir = "dawn_db_manager-master"
+  url = "git+ssh://git@github.com/winslygeorge/dawn_db_manager.git",
+  branch = "master"
 }
 description = {
   summary = "A database manager for Lua, with a native PostgreSQL binding.",
