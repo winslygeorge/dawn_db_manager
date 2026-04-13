@@ -34,6 +34,7 @@ function QueryBuilder.new(table_name, connection_mode, model_class)
         _insert_data = {},
         _on_conflict_clause = nil,
         _connection_mode = connection_mode, -- Store the connection mode for execution
+        _connection_string = nil, -- Store the connection string if needed
         _model_class = model_class, -- Store the associated Model class
         _parameters = {}, -- New: Store parameters for the prepared statement
         _select_aliases = {}, -- New: Store aliases for selected columns, useful for ResultMapper
@@ -366,9 +367,9 @@ function QueryBuilder:get(callback)
     if not self._model_class then
         error("Model class not provided to QueryBuilder for mapping results. Use Model:query():get() or pass Model to QueryBuilder.new().")
     end
-
+    local conn_info = self._connection_string or config.default_conninfo
     local mode = self._connection_mode or config.default_mode
-    local conn = ConnectionManager.get_connection(mode)
+    local conn = ConnectionManager.get_connection(mode, conn_info)
     local sql, params = self:to_sql() -- Get SQL and parameters
     local use_async = self._opts and self._opts.use_async
 
@@ -418,7 +419,8 @@ function QueryBuilder:execute(callback)
     end
 
     local mode = self._connection_mode or config.default_mode
-    local conn = ConnectionManager.get_connection(mode)
+    local conn_info = self._connection_string or config.default_conninfo
+    local conn = ConnectionManager.get_connection(mode, conn_info)
     local sql, params = self:to_sql() -- Get SQL and parameters
     local use_async = self._opts and self._opts.use_async
 

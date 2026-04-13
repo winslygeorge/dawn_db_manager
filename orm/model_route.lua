@@ -33,6 +33,7 @@ end
 function ModelRoute:get_all(req, res, query_params)
     -- Determine the connection mode for the model, falling back to a default if not specified.
     local model_conn_mode = self.Model._connection_mode or config.default_mode
+    local model_conn_info = self.Model._connection_string or config.default_conninfo
 
     --- Helper function to send an error response.
     -- @param err_message string The error message to send.

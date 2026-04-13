@@ -3,14 +3,12 @@
 --- Developers can modify these settings to change the ORM's behavior,
 --- such as the default connection string and the default execution mode.
 
-
-
 local config = {
     --- default_conninfo: The default PostgreSQL connection string.
     --- IMPORTANT: Replace this with your actual PostgreSQL connection details.
     --- Example: "host=localhost port=5432 dbname=mydatabase user=myuser password=mypassword"
     --- @type string
-    default_conninfo = "host=localhost port=5432 dbname=game user=game_player password=1234",
+    default_conninfo =  "host=localhost port=5432 dbname=game user=game_player password=1234",
 
     --- default_mode: The default execution mode for database operations.
     --- Can be "sync" for synchronous operations (blocking) or "async" for asynchronous operations.

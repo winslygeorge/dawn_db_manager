@@ -27,14 +27,14 @@ function ConnectionManager.get_connection(mode, conninfo)
 
   mode = mode or config.default_mode
 
+
+
   config = config or {} -- Ensure config is loaded
   config.drivers = {
     [mode] = mode == "sync" and require("postgres") or require("async_postgres")
   }
 
   conninfo = conninfo or config.default_conninfo
-
-
 
   local driver = config.drivers[mode]
 

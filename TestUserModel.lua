@@ -19,3 +19,4 @@ local TestUser = Model:extend("test_users", {
 })
 
 return TestUser
+

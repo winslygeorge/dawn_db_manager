@@ -56,6 +56,8 @@ function SchemaManager.create_table_sql(Model)
     local foreign_keys = Model._foreign_keys
     local indexes = Model._indexes -- Note: Indexes are typically created separately, not in CREATE TABLE
 
+    local conn_info = Model._connection_string or config.default_conninfo
+
     local column_definitions = {}
     local constraints = {}
     local primary_key_defined_inline = false
@@ -193,8 +195,8 @@ end
 --- @param sql string The SQL statement to execute.
 --- @param mode string The connection mode ("sync" or "async").
 --- @raise error If the execution fails.
-local function execute_ddl(sql, mode)
-    local conn = ConnectionManager.get_connection(mode)
+local function execute_ddl(sql, mode, conn_info)
+    local conn = ConnectionManager.get_connection(mode, conn_info)
     local p_results = nil
     local success, err_or_result = pcall(function()
         if mode == "async" then
@@ -224,13 +226,14 @@ end
 -- @raise error If table creation fails.
 function SchemaManager.create_table(Model, mode)
     mode = mode or Model._connection_mode or config.default_mode
+    local conn_info = Model._connection_string or config.default_conninfo
     local create_sql, index_sqls = SchemaManager.create_table_sql(Model)
     print(string.format("[DDL] Executing CREATE TABLE for %s:\n%s", Model._table_name, create_sql))
-    execute_ddl(create_sql, mode)
+    execute_ddl(create_sql, mode, conn_info)
 
     for _, index_sql in ipairs(index_sqls) do
         print(string.format("[DDL] Executing CREATE INDEX for %s:\n%s", Model._table_name, index_sql))
-        execute_ddl(index_sql, mode)
+        execute_ddl(index_sql, mode, conn_info)
     end
     print(string.format("Table '%s' and its indexes created/ensured.", Model._table_name))
 end
@@ -240,11 +243,11 @@ end
 -- @param cascade boolean (Optional) If true, adds CASCADE to the DROP TABLE statement.
 -- @param mode string (Optional) The connection mode. Defaults to "sync".
 -- @raise error If table dropping fails.
-function SchemaManager.drop_table(table_name, cascade, mode)
+function SchemaManager.drop_table(table_name, cascade, mode, conn_info)
     mode = mode or "async" -- Default to sync for DDL operations
     local drop_sql = SchemaManager.drop_table_sql(table_name, cascade)
     print(string.format("[DDL] Executing DROP TABLE for %s:\n%s", table_name, drop_sql))
-    execute_ddl(drop_sql, mode)
+    execute_ddl(drop_sql, mode, conn_info)
     print(string.format("Table '%s' dropped.", table_name))
 end
 
@@ -275,9 +278,9 @@ end
 -- @param table_name string The name of the table.
 -- @param mode string The connection mode.
 -- @return table A table representing the current schema, or nil if table doesn't exist.
-local function fetch_current_schema(table_name, mode)
+local function fetch_current_schema(table_name, mode, conn_info)
     print(string.format("[SchemaManager] Attempting to fetch current schema for '%s'. (Conceptual)", table_name))
-    local conn = ConnectionManager.get_connection(mode)
+    local conn = ConnectionManager.get_connection(mode, conn_info)
     local success, columns_info_rows = pcall(function()
         -- In a real scenario, you'd execute this query
         return ConnectionManager.execute_query(mode, conn, get_column_info_sql(table_name))
@@ -490,7 +493,9 @@ function SchemaManager.apply_migrations(Model, mode)
     mode = mode or Model._connection_mode or config.default_mode
     local table_name = Model._table_name
 
-    local conn = ConnectionManager.get_connection(mode)
+    local conn_info = Model._connection_string or config.default_conninfo
+
+    local conn = ConnectionManager.get_connection(mode, conn_info)
     local table_exists_query = table_exists_sql(table_name)
     local exists_result = nil
 
@@ -505,22 +510,24 @@ function SchemaManager.apply_migrations(Model, mode)
         error("Schema migration failed due to inability to check table existence.")
     end
 
+    
+
     -- Extract the boolean result from the query result
-    exists_result = success and err_or_result[1] and err_or_result[1].exists
+    exists_result = success and err_or_result[1] and err_or_result[1].exists == "t"
 
     if not exists_result then
         print(string.format("Table '%s' does not exist. Creating table.", table_name))
         SchemaManager.create_table(Model, mode)
     else
         print(string.format("Table '%s' exists. Attempting to apply schema updates.", table_name))
-        local current_schema_info = fetch_current_schema(table_name, mode)
+        local current_schema_info = fetch_current_schema(table_name, mode, conn_info)
         if current_schema_info then
             local alter_sqls = SchemaManager.alter_table_sql(Model, current_schema_info)
             if #alter_sqls > 0 then
                 print(string.format("[DDL] Executing ALTER TABLE statements for %s:", table_name))
                 for _, sql in ipairs(alter_sqls) do
                     print("  " .. sql)
-                    execute_ddl(sql, mode)
+                    execute_ddl(sql, mode, conn_info)
                 end
                 print(string.format("Schema for table '%s' updated.", table_name))
             else

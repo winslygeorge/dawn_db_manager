@@ -62,6 +62,8 @@ function Model:extend(table_name, fields, options)
 
     -- Model-specific properties
     new_model._table_name = table_name
+    -- set the connection string if provided in options, else use default from config
+    new_model._connection_string = options._connection_string or config.default_conninfo
     new_model._fields = fields or {}
     new_model._primary_key = options._primary_key or "id"
     new_model._connection_mode = options._connection_mode -- Can be nil, falling back to config.default_mode
@@ -103,7 +105,7 @@ function Model:extend(table_name, fields, options)
     -- @raise error If the query operation fails.
     local function execute_query_helper(sql, params, callback, is_select, select_aliases)
         local mode = new_model._connection_mode or config.default_mode
-        local conn = ConnectionManager.get_connection(mode)
+        local conn = ConnectionManager.get_connection(mode, new_model._connection_string)
 
         -- restructure sql and params for execution
         if not conn then
