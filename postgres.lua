@@ -27,13 +27,11 @@ local BACKOFF_BASE = 0.2
 local metrics = { queries = 0, failures = 0, total_time = 0 }
 
 local function log(msg)
-    print("[pg] " .. msg)
 end
 
 local function log_metrics()
-    print(string.format("[pg] Metrics: %d queries, %d failures, avg time %.2fms",
-        metrics.queries, metrics.failures,
-        metrics.queries > 0 and (metrics.total_time / metrics.queries * 1000) or 0))
+        -- metrics.queries, metrics.failures,
+        -- metrics.queries > 0 and (metrics.total_time / metrics.queries * 1000) or 0))
 end
 
 function pg.connect(conninfo)

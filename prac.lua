@@ -43,11 +43,9 @@ local ConnectionManager = require("orm.connection_manager")
 -- Define a callback to handle the query result
 local function my_query_callback(result, err)
     if err then
-        print("Query failed:", require("dkjson").encode(err))
         -- Log this error with your application's logger, not the supervisor's internal one
         -- app_logger:log(log_level.ERROR, "Application query error: " .. tostring(err))
     else
-        print("Query succeeded with result:", require("dkjson").encode(result))
         -- Process result
     end
 end
@@ -85,9 +83,7 @@ local CONN_INFO = "host=localhost port=5432 user=game_player password=1234 dbnam
 --     created_at = os.date("!%Y-%m-%dT%H:%M:%SZ")
 -- }, function(err, instance)
 --     if err then
---         print("Failed to create:", err)
 --     else
---         print("Successfully created:", instance)
 --     end
 -- end)
 
@@ -97,10 +93,8 @@ local CONN_INFO = "host=localhost port=5432 user=game_player password=1234 dbnam
     created_at = os.date("!%Y-%m-%dT%H:%M:%SZ")
 }, function(err, instance)
     if err then
-                print("Successfully created:", require('dkjson').encode(instance))
 
     else
-                print("Failed to create:", require('dkjson').encode(err))
 
     end
 end)
@@ -112,9 +106,7 @@ end)
 --     created_at = os.date("!%Y-%m-%dT%H:%M:%SZ")
 -- }, function(err, instance)
 --     if err then
---         print("Failed to create:", err)
 --     else
---         print("Successfully created:", instance)
 --     end
 -- end)
 
@@ -125,9 +117,7 @@ end)
 --     created_at = os.date("!%Y-%m-%dT%H:%M:%SZ")
 -- }, function(err, instance)
 --     if err then
---         print("Failed to create:", err)
 --     else
---         print("Successfully created:", instance)
 --     end
 -- end)
 
@@ -137,21 +127,16 @@ end)
 --     created_at = os.date("!%Y-%m-%dT%H:%M:%SZ")
 -- }, function(err, instance)
 --     if err then
---         print("Failed to create:", err)
 --     else
---         print("Successfully created:", instance)
 --     end
 -- end)
 -- find TestUser by email
 
 -- TestUser:find(2, function(err, instance)
 --     if err then
---         print("Failed to find user:", err)
 --     else
 --         if instance then
---             print("Found user:", cjson.encode(instance))
 --         else
---             print("User not found")
 --         end
 --     end
 -- end)
@@ -160,19 +145,14 @@ end)
 --   email= "dennis@example.com"
 -- }, function(err, users)
 --     if err then
---         print("Error:", err)
 --     else
---         print("Matching users:", require("cjson").encode(users))
 --     end
 -- end)
 
 -- -- search by orm.Model.paginate
 TestUser:paginate(1, 3, function(err, users)
     if err then
-        -- print("Error:", err)
-        print("Paginated users:", require("dkjson").encode(err))
     else
-        print("Error:", require("dkjson").encode(users))
     end
 end)
 
@@ -183,9 +163,7 @@ end)
 --     limit = 3,  -- Example limit
 -- }, function(err, users)
 --     if err then
---         print("Error:", err)
 --     else
---         print("Paginated users with conditions:", require("cjson").encode(users))
 --     end
 -- end)
 
@@ -195,21 +173,17 @@ end)
 --     page = 1,
 --     use_async = true,
 --     on_result = function(result)
---         print("Got async result:", result, require("cjson").encode(result))
 --     end
 -- }
 
 
 
--- print("New user created with ID:", require("cjson").encode (new_user))
 
 -- Find a user by ID
 -- local existing_user = TestUser:find(new_user.id)
 
 -- if existing_user then
---     print("Found user:", existing_user.name, existing_user.email)
 -- else
---     print("User not found")
 -- end
 
     require("luv").run() -- Start the event loop for async operations

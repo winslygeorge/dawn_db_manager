@@ -228,14 +228,11 @@ function SchemaManager.create_table(Model, mode)
     mode = mode or Model._connection_mode or config.default_mode
     local conn_info = Model._connection_string or config.default_conninfo
     local create_sql, index_sqls = SchemaManager.create_table_sql(Model)
-    print(string.format("[DDL] Executing CREATE TABLE for %s:\n%s", Model._table_name, create_sql))
     execute_ddl(create_sql, mode, conn_info)
 
     for _, index_sql in ipairs(index_sqls) do
-        print(string.format("[DDL] Executing CREATE INDEX for %s:\n%s", Model._table_name, index_sql))
         execute_ddl(index_sql, mode, conn_info)
     end
-    print(string.format("Table '%s' and its indexes created/ensured.", Model._table_name))
 end
 
 --- Drops a table from the database.
@@ -246,9 +243,7 @@ end
 function SchemaManager.drop_table(table_name, cascade, mode, conn_info)
     mode = mode or "async" -- Default to sync for DDL operations
     local drop_sql = SchemaManager.drop_table_sql(table_name, cascade)
-    print(string.format("[DDL] Executing DROP TABLE for %s:\n%s", table_name, drop_sql))
     execute_ddl(drop_sql, mode, conn_info)
-    print(string.format("Table '%s' dropped.", table_name))
 end
 
 --- INTERNAL: Generates SQL to check if a table exists.
@@ -279,7 +274,6 @@ end
 -- @param mode string The connection mode.
 -- @return table A table representing the current schema, or nil if table doesn't exist.
 local function fetch_current_schema(table_name, mode, conn_info)
-    print(string.format("[SchemaManager] Attempting to fetch current schema for '%s'. (Conceptual)", table_name))
     local conn = ConnectionManager.get_connection(mode, conn_info)
     local success, columns_info_rows = pcall(function()
         -- In a real scenario, you'd execute this query
@@ -288,7 +282,6 @@ local function fetch_current_schema(table_name, mode, conn_info)
     ConnectionManager.release_connection(mode, conn)
 
     if not success or not columns_info_rows or #columns_info_rows == 0 then
-        print(string.format("[SchemaManager] Could not fetch schema for '%s'. It might not exist or an error occurred.", table_name))
         return nil -- Table might not exist or no columns found
     end
 
@@ -324,7 +317,6 @@ end
 -- @param current_schema_info table A table representing the current database schema.
 -- @return table A list of SQL statements to execute for migration.
 function SchemaManager.alter_table_sql(Model, current_schema_info)
-    print(string.format("[SchemaManager] Generating ALTER TABLE SQL for '%s'. (Conceptual Diffing Logic)", Model._table_name))
     local alter_sqls = {}
     local table_name = Model._table_name
     local desired_fields = Model._fields
@@ -375,7 +367,6 @@ function SchemaManager.alter_table_sql(Model, current_schema_info)
 
             -- Type change (consider carefully as it might lose data)
             if string.lower(current_col.data_type) ~= string.lower(desired_sql_type) then
-                print(string.format("[SchemaManager] INFO: Column '%s.%s' type mismatch. Current: %s, Desired: %s. Generating ALTER TYPE. This might be destructive.", table_name, field_name, current_col.data_type, desired_sql_type))
                 table.insert(alter_sqls, string.format("ALTER TABLE %s ALTER COLUMN %s TYPE %s;", table_name, field_name, desired_sql_type))
             end
 
@@ -395,7 +386,6 @@ function SchemaManager.alter_table_sql(Model, current_schema_info)
                 if field_name ~= Model._primary_key then
                     table.insert(alter_sqls, string.format("ALTER TABLE %s ALTER COLUMN %s DROP NOT NULL;", table_name, field_name))
                 else
-                    print(string.format("[SchemaManager] INFO: Skipping DROP NOT NULL for primary key column '%s.%s' as it's inherently NOT NULL.", table_name, field_name))
                 end
             end
 
@@ -446,7 +436,6 @@ function SchemaManager.alter_table_sql(Model, current_schema_info)
                 if not is_serial_default then
                     table.insert(alter_sqls, string.format("ALTER TABLE %s ALTER COLUMN %s DROP DEFAULT;", table_name, field_name))
                 else
-                    print(string.format("[SchemaManager] INFO: Skipping DROP DEFAULT for SERIAL column '%s.%s' as it's implicitly managed.", table_name, field_name))
                 end
             end
         end
@@ -459,7 +448,6 @@ function SchemaManager.alter_table_sql(Model, current_schema_info)
         -- Skip system columns (like 'id', 'created_at', 'updated_at' if they are standard and not explicitly defined in the model)
         local is_system_col = (col_name == "id" or col_name == "created_at" or col_name == "updated_at")
         if not desired_fields[col_name] and not is_system_col then
-            print(string.format("[SchemaManager] WARNING: Column '%s.%s' exists in DB but not in model. Generating DROP COLUMN. This is highly destructive and should be reviewed!", table_name, col_name))
             table.insert(alter_sqls, string.format("ALTER TABLE %s DROP COLUMN %s;", table_name, col_name))
         end
     end
@@ -476,7 +464,6 @@ function SchemaManager.alter_table_sql(Model, current_schema_info)
     --    This requires comprehensive introspection of the database's `information_schema`
     --    and `pg_indexes` (for PostgreSQL) views to accurately compare and generate
     --    ADD/DROP CONSTRAINT and CREATE/DROP INDEX statements.
-    print("[SchemaManager] Skipping generation of ALTER statements for Primary Keys, Unique Constraints, Foreign Keys, and Indexes due to complexity and the need for detailed DB introspection beyond current capabilities.")
 
 
     return alter_sqls
@@ -506,7 +493,6 @@ function SchemaManager.apply_migrations(Model, mode)
     ConnectionManager.release_connection(mode, conn)
 
     if not success then
-        print(string.format("[SchemaManager] Error checking table existence for '%s': %s", table_name, tostring(err_or_result)))
         error("Schema migration failed due to inability to check table existence.")
     end
 
@@ -516,25 +502,18 @@ function SchemaManager.apply_migrations(Model, mode)
     exists_result = success and err_or_result[1] and err_or_result[1].exists == "t"
 
     if not exists_result then
-        print(string.format("Table '%s' does not exist. Creating table.", table_name))
         SchemaManager.create_table(Model, mode)
     else
-        print(string.format("Table '%s' exists. Attempting to apply schema updates.", table_name))
         local current_schema_info = fetch_current_schema(table_name, mode, conn_info)
         if current_schema_info then
             local alter_sqls = SchemaManager.alter_table_sql(Model, current_schema_info)
             if #alter_sqls > 0 then
-                print(string.format("[DDL] Executing ALTER TABLE statements for %s:", table_name))
                 for _, sql in ipairs(alter_sqls) do
-                    print("  " .. sql)
                     execute_ddl(sql, mode, conn_info)
                 end
-                print(string.format("Schema for table '%s' updated.", table_name))
             else
-                print(string.format("Schema for table '%s' is already up to date. No ALTER statements needed.", table_name))
             end
         else
-            print(string.format("[SchemaManager] WARNING: Could not fetch current schema for '%s'. Skipping ALTER TABLE attempts.", table_name))
         end
     end
 end

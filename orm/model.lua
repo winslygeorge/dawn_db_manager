@@ -237,7 +237,6 @@ function Model:extend(table_name, fields, options)
 
                     table.insert(model_mapping, { model = related_model_class, prefix = related_prefix, relation_name = relation_name })
                 else
-                    print(string.format("Warning: Relation '%s' not found in model '%s'.", relation_name, new_model._table_name))
                 end
             end
         end
@@ -923,7 +922,6 @@ end
                             qb:order_by(order.column, order.direction)
                         else
                             -- Log warning or error if format is incorrect
-                            print("Warning: Invalid order_by format. Expected table with 'column' and 'direction'.")
                         end
                     end
                 else

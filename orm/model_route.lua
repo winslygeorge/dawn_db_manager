@@ -379,7 +379,6 @@ function ModelRoute:delete(req, res, query_params)
 
             instance:delete(function(delete_err, delete_success)
                 if delete_err or not delete_success then
-                    -- print("Error deleting instance:", delete_err)
                     return send_error(tostring(delete_err or "Unknown delete error"), 500)
                 end
                 res:writeStatus(204):send(json.encode({message = "Delete request successful", model = delete_success})) -- No Content for successful deletion

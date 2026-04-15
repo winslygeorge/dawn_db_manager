@@ -1,8 +1,8 @@
 # Config
 
 MODULE_NAME = dawn_db
-ROCKSPEC = dawn_db-1.0-10.rockspec
-ROCKFILE = $(MODULE_NAME)-1.0-10.rock
+ROCKSPEC = dawn_db-1.0-11.rockspec
+ROCKFILE = $(MODULE_NAME)-1.0-11.rock
 LUAJIT_INCLUDE = /usr/include/luajit-2.1
 BUILD_DIR = build
 CMAKE_BUILD_DIR = $(BUILD_DIR)/cmake
@@ -40,7 +40,6 @@ install:
 
 test:
 	@echo "🧪 Testing installed module..."
-	@echo 'local db = require("$(MODULE_NAME)") print("[✓] Loaded $(MODULE_NAME)") print("[✓] db.config =", db.config and "OK" or "MISSING")' > test.lua
 	@luajit test.lua
 	@rm -f test.lua
 clean:

@@ -51,7 +51,6 @@ local metrics = { queries = 0, failures = 0, total_time = 0 }
 
 -- Simple logging function
 local function log(msg)
-    print("[pg/async] " .. msg)
 end
 --- Connects to a PostgreSQL database.
 -- @param conninfo A connection string (e.g., "host=localhost port=5432 user=dbuser password=dbpass dbname=mydb")
@@ -76,7 +75,6 @@ end
 -- -- @param conn The PGconn* connection object to close.
 -- function pg.close(conn)
 --     if conn then
---         print("Closing connection with socket:", libpq.PQsocket(conn))
 --         libpq.PQfinish(conn)
 --         log("PostgreSQL connection closed.")
 --     end
@@ -90,7 +88,6 @@ function pg.close(conn)
     if conn then
         local status = libpq.PQstatus(conn)
         local socket = libpq.PQsocket(conn)
-        print("Closing connection with socket:", socket, " status ok : ",  CONNECTION_OK, " status: ", status)
 
         if status == CONNECTION_OK  then
             libpq.PQfinish(conn)
@@ -139,7 +136,6 @@ function pg.query_async(conn, sql, cb, retry_count)
         return cb("Failed to get socket descriptor for polling: " .. err)
     end
 
-    print("Socket fd: ", sock_fd)
 
     local poll, err_code = uv.new_poll(sock_fd) -- Correctly capture the error code from uv.new_poll
 
@@ -239,7 +235,6 @@ end
             metrics.queries = metrics.queries + 1
             metrics.total_time = metrics.total_time + (uv.now() - start_time) -- Update total time
             log("Query successful. Rows returned: " .. #all_rows)
-            -- print("rows: ", #all_rows, require('cjson').encode(all_rows)) -- Uncomment if 'cjson' is available and desired for debugging
             log(string.format("Metrics: %d queries, %d failures, avg %.2f ms",
                 metrics.queries, metrics.failures, metrics.total_time / metrics.queries))
 
@@ -266,8 +261,6 @@ end
 --- Logs current performance metrics.
 function pg.log_metrics()
     local avg = metrics.queries > 0 and (metrics.total_time / metrics.queries) or 0
-    print(string.format("[pg] %d queries, %d failures, avg %.2f ms",
-        metrics.queries, metrics.failures, avg))
 end
 
 pg.metrics = metrics -- Expose metrics table
